@@ -1,16 +1,27 @@
+*** Settings ***
+Documentation  Rest Testing in Robot Framework
+Library  SeleniumLibrary
+Library  RequestsLibrary
+Library  JSONLibrary
+Library  Collections
+
 *** Test Cases ***
 Asking for 'life;universe;everything' give us 42
-    # Implement a proper test that will:
-    # - Send a GET request to the server, on the resource `/answer`, with
-    # the following value on the `search` parameter: life;universe;everything
-    # - Ensure the server replied with 200 error code
-    # - Ensure the server replied 42
+    [documentation]  This test case verifies that the response code of the GET Request should be 200,
+    ...  the response content is "42".
+    Create Session  mysession  http://server:80/  verify=true
+    ${response}=  GET On Session  mysession  /answer  params=search=life;universe;everything
+    Status Should Be  200     ${response}  #Check Status as 200
+
+    #Check content as "42" from Response 
+     Should Be Equal As Strings  42  ${response.text}
 
 Asking for something else give us unknown
-    # Implement a proper test that will:
-    # - Send a GET request to the server, on the resource `/answer`, with
-    # the following value on the `search` parameter: the truth
-    # - Ensure the server replied with 404 error code
-    # - Ensure the server replied unknown
-    # Note: You can also ask other things, but we don't think it will be able
-    # to give a good answer.
+    [documentation]  This test case verifies that the response code of the GET Request should be 404,
+    ...  the response content is "unknown"
+    Create Session  mysession  http://server:80/  verify=true
+    ${response}=  GET On Session  mysession  /answer  expected_status=any   params=search=the truth 
+    Status Should Be  404     ${response}  #Check Status as 404
+
+    #Check content is "unknow" from Response 
+     Should Be Equal As Strings  unknown  ${response.text}
